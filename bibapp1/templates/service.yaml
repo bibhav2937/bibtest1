@@ -4,6 +4,9 @@ metadata:
   name: {{ include "bibapp1.fullname" . }}
   labels:
     {{- include "bibapp1.labels" . | nindent 4 }}
+  # annotations:
+  #   prometheus.io/scrape: 'true'
+  #   prometheus.io/port: "{{ .Values.service.port }}"
 spec:
   type: {{ .Values.service.type }}
   ports:
