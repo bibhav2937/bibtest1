@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-demo
+spec:
+  replicas: 10
+  strategy:
+    canary:
+      analysis:
+        templates:
+          - templateName: success-template
+        startingStep: 2
+      canaryService: rollouts-demo-canary
+      stableService: rollouts-demo-stable
+      trafficRouting:
+        nginx:
+          stableIngress: rollouts-demo-stable
+      steps:
+      - setWeight: 20
+      - pause: {}
+      - setWeight: 60
+      - pause: { duration: 5m}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: rollouts-demo
+  template:
+    metadata:
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/port: "8003"
+      labels:
+        app: rollouts-demo
+    spec:
+      containers:
+      - name: bib1
+        image: bnginxapp1:v1
+        ports:
+        - containerPort: 80
+          name: http
+      - name: bib1-prom
+        image: bapp1:v1
+        ports:
+        - containerPort: 8003
+          name: http-prom          
